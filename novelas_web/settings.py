@@ -1,4 +1,3 @@
-
 """
 Django settings for novelas_web project.
 
@@ -25,9 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$-y4u@gx^ib#n$)ja7jbkksj$2ypl^=bhmr5qevcosh9lkq%^s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# NOTA: Cuando subas a producción real, es ideal poner esto en False.
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# MODIFICACIÓN 1: Permitir cualquier host (necesario para Render)
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -44,6 +45,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # MODIFICACIÓN 2: WhiteNoise va justo después de SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,5 +122,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# MODIFICACIÓN 3: Configuración de archivos estáticos para Producción (Render)
+# Esto le dice a Django dónde reunir los estilos y que use WhiteNoise para servirlos
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
