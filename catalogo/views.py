@@ -1,11 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Novela
 
 def inicio(request):
-    # Esto busca TODAS las novelas que guardaste en la base de datos
     novelas = Novela.objects.all()
-    # Y las envía a un archivo HTML que crearemos después
     return render(request, 'inicio.html', {'novelas': novelas})
 
-
+def detalle(request, id):
+    # Esto busca una novela específica por su ID único
+    novela = get_object_or_404(Novela, pk=id)
+    return render(request, 'detalle.html', {'novela': novela})
 # Create your views here.
