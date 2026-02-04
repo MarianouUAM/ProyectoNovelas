@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
-from catalogo.views import inicio, detalle # <--- Importamos detalle
+from catalogo.views import inicio, detalle 
+from catalogo.views import buscar_novelas
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -8,6 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', inicio, name='inicio'),
     path('novela/<int:id>/', detalle, name='detalle'), 
+    path('buscar_ajax/', buscar_novelas, name='buscar_ajax'),
 ]
 
 if settings.DEBUG:
