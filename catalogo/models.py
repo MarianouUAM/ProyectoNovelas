@@ -21,7 +21,10 @@ class Novela(models.Model):
     descripcion = models.TextField(verbose_name="Sinopsis")
     imagen = models.ImageField(upload_to='portadas/', verbose_name="Portada")
     link_drive = models.URLField(verbose_name="Enlace a Google Drive")
-    
+
+    # --- NUEVO CAMPO AGREGADO ---
+    vistas = models.PositiveIntegerField(default=0, verbose_name="Visitas")
+
     def obtener_lista_generos(self):
         # Si no hay género escrito, devuelve una lista vacía
         if not self.genero:

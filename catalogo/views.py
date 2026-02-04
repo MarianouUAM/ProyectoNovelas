@@ -1,14 +1,14 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
-from django.core.paginator import Paginator 
+from django.core.paginator import Paginator
 from .models import Novela
 
 def inicio(request):
-
+    # 1. Traemos todas las novelas (ordenadas por ID)
     novelas_lista = Novela.objects.all().order_by('-id')
 
- 
+    # 2. Lógica del Buscador
     busqueda = request.GET.get('q')
     if busqueda:
         novelas_lista = novelas_lista.filter(
@@ -16,12 +16,12 @@ def inicio(request):
             Q(genero__icontains=busqueda)
         )
 
- 
+    # 3. Filtros por Tipo
     tipo_filtrado = request.GET.get('tipo')
     if tipo_filtrado:
         novelas_lista = novelas_lista.filter(tipo=tipo_filtrado)
 
-    # Mostraremos 8 novelas por página 
+    # 4. Paginación (8 por página)
     paginator = Paginator(novelas_lista, 8) 
     page_number = request.GET.get('page')
     novelas_paginadas = paginator.get_page(page_number)
@@ -30,7 +30,19 @@ def inicio(request):
 
 def detalle(request, id):
     novela = get_object_or_404(Novela, pk=id)
-    return render(request, 'detalle.html', {'novela': novela})
+    
+    # --- NUEVO: CONTADOR DE VISITAS ---
+    novela.vistas += 1
+    novela.save() # Guardamos el nuevo número en la base de datos
+    
+    # --- NUEVO: NOVELAS RELACIONADAS ---
+    # Busca novelas del mismo tipo, excluye la que estamos viendo, y toma 3 al azar
+    relacionadas = Novela.objects.filter(tipo=novela.tipo).exclude(id=id).order_by('?')[:3]
+    
+    return render(request, 'detalle.html', {
+        'novela': novela,
+        'relacionadas': relacionadas
+    })
 
 def buscar_novelas(request):
     query = request.GET.get('q', '')
