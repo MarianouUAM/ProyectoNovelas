@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ novela.titulo }} | Detalles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTÉTICA BASE --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar { background: rgba(15, 12, 41, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .navbar-brand { font-weight: 700; color: #00d2ff !important; text-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
+
+        /* --- ANIMACIONES --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- PANEL DE CRISTAL --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 50px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0; 
+        }
+
+        /* --- IMAGEN DE PORTADA --- */
+        .cover-img {
+            width: 100%; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 210, 255, 0.2);
+            transition: transform 0.3s ease; animation: fadeInUp 1s ease-out forwards; animation-delay: 0.2s; opacity: 0;
+        }
+        .cover-img:hover { transform: scale(1.02); box-shadow: 0 15px 40px rgba(0, 210, 255, 0.4); }
+
+        /* --- BOTÓN DESCARGA --- */
+        .btn-download {
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5); border: none; color: white; padding: 15px 30px; 
+            font-weight: bold; border-radius: 50px; width: 100%; margin-top: 20px; transition: 0.2s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-download:hover { transform: scale(1.05); color: white; box-shadow: 0 0 25px rgba(0, 210, 255, 0.6); }
+
+        .btn-back { color: #b3b3b3; text-decoration: none; margin-bottom: 20px; display: inline-block; transition: 0.3s; }
+        .btn-back:hover { color: #fff; transform: translateX(-5px); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid px-5">
+            <a class="navbar-brand" href="{% url 'inicio' %}">NovelasWeb</a>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <div class="glass-panel">
+            <a href="{% url 'inicio' %}" class="btn-back">&larr; Volver al catálogo</a>
+            
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    {% if novela.imagen %}
+                    <img src="{{ novela.imagen.url }}" class="cover-img" alt="{{ novela.titulo }}">
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-8">
+                    <h1 class="fw-bold mb-3 display-5">{{ novela.titulo }}</h1>
+                    
+                    <div class="mb-4">
+                        {% if novela.tipo == 'Novela China' %}
+                            <span class="badge" style="background: linear-gradient(45deg, #ff416c, #ff4b2b);">{{ novela.tipo }}</span>
+                        {% elif novela.tipo == 'Novela Web' %}
+                            <span class="badge" style="background: linear-gradient(45deg, #4b6cb7, #182848);">{{ novela.tipo }}</span>
+                        {% else %}
+                            <span class="badge" style="background: linear-gradient(45deg, #00d2ff, #3a7bd5);">{{ novela.tipo }}</span>
+                        {% endif %}
+                        
+                        <span class="badge bg-dark border border-secondary">PDF / EPUB</span>
+
+                        <span class="badge text-white-50 ms-2" style="background: rgba(255,255,255,0.05);">
+                            👁️ {{ novela.vistas }} vistas
+                        </span>
+                    </div>
+
+                    <h4 class="text-info border-bottom border-secondary pb-2 mb-3">Sinopsis</h4>
+                    <p class="lead" style="font-size: 1rem; color: #e0e0e0; line-height: 1.8; text-align: justify;">
+                        {{ novela.descripcion|linebreaks }}
+                    </p>
+                    
+                    <div class="mt-5">
+                        <a href="{{ novela.link_drive }}" target="_blank" class="btn btn-download">
+                            Descargar 
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {% if relacionadas %}
+            <div class="mt-5 pt-4 border-top border-secondary">
+                <h4 class="text-white mb-4 opacity-75">También te podría gustar estos titulos </h4>
+                <div class="row g-4">
+                    {% for rel in relacionadas %}
+                    <div class="col-6 col-md-4">
+                        <div class="card bg-transparent border-0 h-100">
+                            <div style="height: 250px; overflow: hidden; border-radius: 10px; position: relative;">
+                                <a href="{% url 'detalle' rel.id %}">
+                                    <img src="{{ rel.imagen.url }}" style="width: 100%; height: 100%; object-fit: cover; transition: 0.3s;" 
+                                         onmouseover="this.style.transform='scale(1.1)'" 
+                                         onmouseout="this.style.transform='scale(1)'">
+                                </a>
+                                <span class="badge position-absolute top-0 end-0 m-2 bg-dark bg-opacity-75">{{ rel.tipo }}</span>
+                            </div>
+                            <div class="mt-2 text-center">
+                                <a href="{% url 'detalle' rel.id %}" class="text-white text-decoration-none fw-bold">
+                                    {{ rel.titulo|truncatechars:30 }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</body>
+</html>
